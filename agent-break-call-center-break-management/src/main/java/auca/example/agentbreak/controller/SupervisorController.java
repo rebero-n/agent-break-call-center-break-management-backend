@@ -53,5 +53,32 @@ public class SupervisorController {
     public ResponseEntity<List<Supervisor>> getSupervisorsByQueue(@RequestParam String name) {
         return ResponseEntity.ok(supervisorService.getSupervisorsByQueue(name));
     }
+    @PutMapping("/{supervisorId}/queues/{queueId}")
+    public ResponseEntity<String> addQueue(
+        @PathVariable UUID supervisorId,
+        @PathVariable UUID queueId
+    ) {
+        String message = supervisorService.addQueue(supervisorId, queueId);
+        if (message.equals("The supervisor with that id does not exist") || message.equals("That queue does not exist")) {
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        } else if (message.equals("The supervisor already has that queue")) {
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+    @PatchMapping ("/{supervisorId}/team")
+    public ResponseEntity<String> changeTeam(
+        @PathVariable UUID supervisorId,
+        @RequestParam int teamNumber
+    ) {
+        String message = supervisorService.changeTeam(supervisorId, teamNumber);
+        if(message.equals("The supervisor with that id does not exist") || message.equals("The team with that team number does not exist")){
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        } else if (message.equals("That team is taken by another supervisor")) {
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
 }
+
 
